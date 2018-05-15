@@ -28,12 +28,12 @@ public class Board extends JPanel {
 		graphics.drawString(Integer.toString(dim.height), 20, 20);
 		
 		for(Point part : Snake.snakeBody) {
-				graphics.fillRect(part.x, part.y, Snake.bodyPartSize-1, Snake.bodyPartSize-1);
+			graphics.fillOval(part.x, part.y, Snake.bodyPartSize-1, Snake.bodyPartSize-1);
 		}
 		
 		graphics.setColor(appleColor);
 		if(null != Snake.apple) 
-			graphics.fillRect(Snake.apple.x, Snake.apple.y, Snake.bodyPartSize-1, Snake.bodyPartSize-1);
+			graphics.fillOval(Snake.apple.x, Snake.apple.y, Snake.bodyPartSize-1, Snake.bodyPartSize-1);
 	}
 	
 }

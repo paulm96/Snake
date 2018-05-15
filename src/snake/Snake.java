@@ -10,8 +10,11 @@ import javax.swing.JSlider;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -40,17 +43,21 @@ public class Snake implements ActionListener, KeyListener {
 		snakeHead = snakeBody.get(snakeBody.size()-1);
 		direction = Direction.DOWN;
 		board.addKeyListener(this);
-		timer.start();
+//		timer.start();
 	}
 	
 	public void createGUI() {
 		JFrame myJFrame = new JFrame();
 		myJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myJFrame.setResizable(false);
-		myJFrame.setSize(616,648);  //uzaleznic size od rozdzielczosci ekranu
+		myJFrame.setSize(496,319);  //uzaleznic size od rozdzielczosci ekranu
 		myJFrame.setLocation(100,100); //to tez uzaleznic
-		myJFrame.setLayout(new GridLayout(2,1,10,10));		
-		myJFrame.add(board);		
+		//myJFrame.setLayout(new GridLayout(2,1,10,10));
+		JPanel jpanel = new JPanel(new BorderLayout());
+		myJFrame.add(jpanel);
+//		myJFrame.add(board);
+		jpanel.add(board, BorderLayout.CENTER);
+		//jpanel.setSize(200, 200);
 		
 		var buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		buttonPanel.setFocusable(false);
@@ -60,21 +67,55 @@ public class Snake implements ActionListener, KeyListener {
 		myPanel.setFocusable(false);
 		myPanel.add(buttonPanel);
 		myPanel.add(sliderPanel);
-		myJFrame.add(myPanel);
+//		myJFrame.add(myPanel);
+		myJFrame.add(myPanel, BorderLayout.PAGE_END);
 		
 		var startButton = new JButton("START");
 		startButton.setFocusable(false);
+		startButton.setFont(new Font("Arial", Font.PLAIN, 10));
+		startButton.addActionListener(new ActionListener() {
+		
+			@Override
+			public void actionPerformed(ActionEvent button) {
+				// TODO Auto-generated method stub
+				if(startButton.getText() == "START" || startButton.getText() == "RESUME") {
+					startButton.setText("PAUSE");
+					startGame();
+				} else {
+					startButton.setText("RESUME");
+					pauseGame();
+				}
+			}
+		});
 		buttonPanel.add(startButton);
 		var restartButton = new JButton("RESTART");
 		restartButton.setFocusable(false);
+		restartButton.setFont(new Font("Arial", Font.PLAIN, 10));
+		restartButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				restartGame();
+			}
+		});
 		buttonPanel.add(restartButton);
-		var endButton = new JButton("END");
-		endButton.setFocusable(false);
-		buttonPanel.add(endButton);
+		var exitButton = new JButton("EXIT");
+		exitButton.setFocusable(false);
+		exitButton.setFont(new Font("Arial", Font.PLAIN, 10));
+		exitButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				System.exit(0);
+			}
+		});
+		buttonPanel.add(exitButton);
 		
 		JSlider speedSlider = new JSlider(JSlider.HORIZONTAL, 20, 100, 50);
 		speedSlider.setFocusable(false);
-		speedSlider.setMinorTickSpacing(1000);
+//		speedSlider.setMinorTickSpacing(1000);
 		speedSlider.setMajorTickSpacing(10);
 		speedSlider.setPaintLabels(true);
 		speedSlider.setPaintTicks(true);
@@ -96,14 +137,43 @@ public class Snake implements ActionListener, KeyListener {
 		myJFrame.setVisible(true);
 	}
 	
+	public void startGame() {
+		timer.start();
+	}
+	
+	public void pauseGame() {
+		timer.stop();
+	}
+	
+	public void restartGame() {
+		timer.stop();
+		snakeBody.clear();
+		for(int i = 0; i < 5; i++)  //5 is initial snake's size
+			snakeBody.add(new Point(0, i*bodyPartSize));
+		snakeHead = snakeBody.get(snakeBody.size()-1);
+		direction = Direction.DOWN;
+		timer.start();
+		
+	}
+	
 	public void generateApple(Dimension dim) {
 		int x = rand.nextInt(dim.width);
 		int y = rand.nextInt(dim.height);
-		while(x % bodyPartSize != 0) {
-			x = rand.nextInt(dim.width - bodyPartSize);
-		}
-		while(y % bodyPartSize != 0) {
-			y = rand.nextInt(dim.height - bodyPartSize);
+		boolean found = false;
+		while(!found) {
+			while(x % bodyPartSize != 0) {   //apple should be generated in the same multiple pixels as snake parts
+				x = rand.nextInt(dim.width - bodyPartSize);
+			}
+			while(y % bodyPartSize != 0) {
+				y = rand.nextInt(dim.height - bodyPartSize);
+			}
+			for(Point point : snakeBody) {
+				if(point.x == x && point.y == y) {  //if apple's point collides with snake found is still false
+					found = false;
+					break;
+				}
+				found = true;
+			}
 		}
 		apple = new Point(x,y);
 	}
@@ -113,11 +183,11 @@ public class Snake implements ActionListener, KeyListener {
 		// TODO Auto-generated method stub
 		Dimension dim = board.getSize();
 		if(null == apple) {
-//			apple = new Point(rand.nextInt(dim.width), rand.nextInt(dim.height));
 			generateApple(dim);
 		}
+		
 		time++;
-		if(time % speed == 0) {
+		if(time % (110 - speed) == 0) {
 			if(direction == Direction.DOWN) {
 				if(snakeHead.y + bodyPartSize >= dim.height)
 					snakeBody.add(new Point(snakeHead.x, 0));
