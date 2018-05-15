@@ -10,7 +10,8 @@ import javax.swing.JPanel;
 
 
 public class Board extends JPanel {
-	private Color snakeColor = new Color(210,0,0);
+	private Color snakeColor = new Color(0,0,0);
+	private Color appleColor = new Color(255,0,0);
 	public Board() {
 		setOpaque(true);
 		setBackground(Color.green);
@@ -22,13 +23,17 @@ public class Board extends JPanel {
 		// TODO Auto-generated method stub
 		super.paintComponent(graphics);
 		graphics.setColor(snakeColor);
-//		var dim = getSize();
-//		graphics.drawString(Integer.toString(dim.width), 10, 10);
-//		graphics.drawString(Integer.toString(dim.height), 20, 20);
+		var dim = getSize();
+		graphics.drawString(Integer.toString(dim.width), 10, 10);
+		graphics.drawString(Integer.toString(dim.height), 20, 20);
 		
 		for(Point part : Snake.snakeBody) {
 				graphics.fillRect(part.x, part.y, Snake.bodyPartSize-1, Snake.bodyPartSize-1);
 		}
+		
+		graphics.setColor(appleColor);
+		if(null != Snake.apple) 
+			graphics.fillRect(Snake.apple.x, Snake.apple.y, Snake.bodyPartSize-1, Snake.bodyPartSize-1);
 	}
 	
 }

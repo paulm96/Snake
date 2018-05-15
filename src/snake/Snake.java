@@ -1,7 +1,7 @@
 package snake;
 
 import java.util.ArrayList;
-
+import java.util.Random;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -10,8 +10,6 @@ import javax.swing.JSlider;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.tools.DiagnosticCollector;
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -25,13 +23,15 @@ public class Snake implements ActionListener, KeyListener {
 	
 	public Direction direction;
 	public Board board = new Board();
+	public static Point apple = null; 
 	public static ArrayList<Point> snakeBody = new ArrayList<Point>();
 	public Point snakeHead;
-	public static final int bodyPartSize = 10;
+	public static final int bodyPartSize = 12;
 	public Timer timer = new Timer(5,this);
 	public int time = 0;
 	public int speed;
-
+	Random rand = new Random();
+//	Dimension dim;
 	public Snake() {
 		createGUI();
 		speed = 50;
@@ -47,10 +47,10 @@ public class Snake implements ActionListener, KeyListener {
 		JFrame myJFrame = new JFrame();
 		myJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myJFrame.setResizable(false);
-		myJFrame.setSize(566,628);  //uzaleznic size od rozdzielczosci ekranu
+		myJFrame.setSize(616,648);  //uzaleznic size od rozdzielczosci ekranu
 		myJFrame.setLocation(100,100); //to tez uzaleznic
 		myJFrame.setLayout(new GridLayout(2,1,10,10));		
-		myJFrame.add(board);
+		myJFrame.add(board);		
 		
 		var buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		buttonPanel.setFocusable(false);
@@ -84,9 +84,9 @@ public class Snake implements ActionListener, KeyListener {
 		speedSlider.addChangeListener(new ChangeListener() {
 			
 			@Override
-			public void stateChanged(ChangeEvent arg0) {
+			public void stateChanged(ChangeEvent slider) {
 				// TODO Auto-generated method stub
-				JSlider source = (JSlider)arg0.getSource();				
+				JSlider source = (JSlider)slider.getSource();				
 				if(!source.getValueIsAdjusting()) {
 					speed = source.getValue();
 				}
@@ -95,39 +95,87 @@ public class Snake implements ActionListener, KeyListener {
 		
 		myJFrame.setVisible(true);
 	}
+	
+	public void generateApple(Dimension dim) {
+		int x = rand.nextInt(dim.width);
+		int y = rand.nextInt(dim.height);
+		while(x % bodyPartSize != 0) {
+			x = rand.nextInt(dim.width - bodyPartSize);
+		}
+		while(y % bodyPartSize != 0) {
+			y = rand.nextInt(dim.height - bodyPartSize);
+		}
+		apple = new Point(x,y);
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent timer) {
 		// TODO Auto-generated method stub
 		Dimension dim = board.getSize();
+		if(null == apple) {
+//			apple = new Point(rand.nextInt(dim.width), rand.nextInt(dim.height));
+			generateApple(dim);
+		}
 		time++;
 		if(time % speed == 0) {
 			if(direction == Direction.DOWN) {
-				if(snakeHead.y + bodyPartSize == dim.height)
+				if(snakeHead.y + bodyPartSize >= dim.height)
 					snakeBody.add(new Point(snakeHead.x, 0));
 				else
-					snakeBody.add(new Point(snakeHead.x, snakeHead.y+bodyPartSize));
-				
-				snakeHead = snakeBody.get(snakeBody.size()-1);
-				snakeBody.remove(0);
+					snakeBody.add(new Point(snakeHead.x, snakeHead.y+bodyPartSize));					
 			}
+			
 			if(direction == Direction.UP) {
-				snakeBody.add(new Point(snakeHead.x, snakeHead.y-bodyPartSize));
-				snakeHead = snakeBody.get(snakeBody.size()-1);
-				snakeBody.remove(0);
+				if(snakeHead.y - bodyPartSize < 0)
+					snakeBody.add(new Point(snakeHead.x, dim.height - bodyPartSize));
+				else
+					snakeBody.add(new Point(snakeHead.x, snakeHead.y-bodyPartSize));
 			}
+			
 			if(direction == Direction.LEFT) {
-				snakeBody.add(new Point(snakeHead.x-bodyPartSize, snakeHead.y));
-				snakeHead = snakeBody.get(snakeBody.size()-1);
-				snakeBody.remove(0);
+				if(snakeHead.x - bodyPartSize < 0)
+					snakeBody.add(new Point(dim.width - bodyPartSize, snakeHead.y));
+				else
+					snakeBody.add(new Point(snakeHead.x - bodyPartSize, snakeHead.y));
 			}
+			
 			if(direction == Direction.RIGHT) {
-				snakeBody.add(new Point(snakeHead.x+bodyPartSize, snakeHead.y));
-				snakeHead = snakeBody.get(snakeBody.size()-1);
-				snakeBody.remove(0);
+				if(snakeHead.x + bodyPartSize >= dim.width)
+					snakeBody.add(new Point(0, snakeHead.y));
+				else
+					snakeBody.add(new Point(snakeHead.x + bodyPartSize, snakeHead.y));
+				
 			}
+		
+			snakeHead = snakeBody.get(snakeBody.size()-1);  //move the head
+			
+			if(!snakeHead.equals(apple))   //if snake doesn't collide with an apple
+				snakeBody.remove(0);       //shorten the tail
+			else
+				apple = null;
+			
+			for(int i = 0; i < snakeBody.size()-1; i++) {  
+				if(snakeHead.equals(snakeBody.get(i))) {   //check if snake collides with itself
+					endGame();
+				}
+			}
+			
 		}
+		
 		board.repaint();
+		
+		
+		
+
+		
+//		snakeHead = snakeBody.get(snakeBody.size()-1);
+//		snakeBody.remove(0);
+		
+			
+	}
+	
+	public void endGame() {
+		timer.stop();
 	}
 
 	@Override
