@@ -10,11 +10,11 @@ import javax.swing.JPanel;
 
 
 public class Board extends JPanel {
-	private Color snakeColor = new Color(0,0,0);
+	private Color snakeColor = Color.green;
 	private Color appleColor = new Color(255,0,0);
 	public Board() {
 		setOpaque(true);
-		setBackground(Color.green);
+		setBackground(Color.black);
 		setFocusable(true);
 		// TODO Auto-generated constructor stub
 	}

@@ -96,6 +96,7 @@ public class Snake implements ActionListener, KeyListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
+				startButton.setText("PAUSE");
 				restartGame();
 			}
 		});
@@ -159,23 +160,34 @@ public class Snake implements ActionListener, KeyListener {
 	public void generateApple(Dimension dim) {
 		int x = rand.nextInt(dim.width);
 		int y = rand.nextInt(dim.height);
-		boolean found = false;
+		boolean found = false;  //if apple is found
+		System.out.println("japko");
 		while(!found) {
+			System.out.println("japko_while1");
 			while(x % bodyPartSize != 0) {   //apple should be generated in the same multiple pixels as snake parts
+				System.out.println("japko_while2");
 				x = rand.nextInt(dim.width - bodyPartSize);
 			}
 			while(y % bodyPartSize != 0) {
+				System.out.println("japko_while3");
 				y = rand.nextInt(dim.height - bodyPartSize);
 			}
 			for(Point point : snakeBody) {
-				if(point.x == x && point.y == y) {  //if apple's point collides with snake found is still false
+				System.out.println("japko_for");
+				if(point.x == x && point.y == y) {  //if apple's point collides with snake
+					System.out.println("japko_if");
 					found = false;
+					x = y = 0;
 					break;
 				}
 				found = true;
+				System.out.println("japko_forzaif");
+				
 			}
 		}
+		System.out.println("japko_koniec1");
 		apple = new Point(x,y);
+		System.out.println("japko_koniec2");
 	}
 
 	@Override
@@ -218,30 +230,28 @@ public class Snake implements ActionListener, KeyListener {
 			}
 		
 			snakeHead = snakeBody.get(snakeBody.size()-1);  //move the head
+			System.out.println("tutej");
 			
-			if(!snakeHead.equals(apple))   //if snake doesn't collide with an apple
+			if(!snakeHead.equals(apple)) {   //if snake doesn't collide with an apple
 				snakeBody.remove(0);       //shorten the tail
-			else
+				System.out.println("tutej2");
+			}
+			else {
 				apple = null;
+				System.out.println("tutej3");
+			}
 			
-			for(int i = 0; i < snakeBody.size()-1; i++) {  
+			for(int i = 0; i < snakeBody.size()-1; i++) {
+				System.out.println(snakeBody.size()-1);
+				System.out.println("tutej_for");
 				if(snakeHead.equals(snakeBody.get(i))) {   //check if snake collides with itself
+					System.out.println("tutej_endgame");
 					endGame();
 				}
 			}
 			
-		}
-		
+		}	
 		board.repaint();
-		
-		
-		
-
-		
-//		snakeHead = snakeBody.get(snakeBody.size()-1);
-//		snakeBody.remove(0);
-		
-			
 	}
 	
 	public void endGame() {
