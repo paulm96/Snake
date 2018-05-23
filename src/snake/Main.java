@@ -1,16 +1,14 @@
 package snake;
 import java.awt.EventQueue;
-public class Test {
+
+public class Main {
 	public static void main(String[] args) {
 		
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-//				new MyFrame();
 				new Snake();
 			}
 		});
-		
-//		Snake snake = new Snake();
 	}
 }

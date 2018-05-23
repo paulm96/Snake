@@ -1,6 +1,5 @@
 package snake;
 
-import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -10,19 +9,16 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-public class MyFrame extends JFrame {
+public class ResultFrame extends JFrame {
 	
-	public MyFrame(String statement) {
+	public ResultFrame(String statement) {
 		
 		setLayout(new GridLayout(2,1));
 		
 		setResizable(false);
-		setSize(100,100);  //uzaleznic size od rozdzielczosci ekranu
-		setLocation(200,150); //to tez uzaleznic
+		setSize(100,100);
+		setLocation(200,150);
 		
 		JPanel myPanel = new JPanel();
 		add(myPanel);

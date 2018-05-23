@@ -1,6 +1,7 @@
 package snake;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.Random;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -10,7 +11,6 @@ import javax.swing.JSlider;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -34,6 +34,23 @@ public class Snake implements ActionListener, KeyListener {
 	public int time = 0;
 	public int speed;
 	Random rand = new Random();
+	HelloThread painting;
+	
+	public class HelloThread extends Thread {
+
+	    public void run() {
+	    	while(true) {
+	    		try {
+					TimeUnit.MILLISECONDS.sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		board.repaint();
+	    	}
+	    }
+	    
+	}
 	
 	public Snake() {
 		createGUI();
@@ -43,30 +60,33 @@ public class Snake implements ActionListener, KeyListener {
 		snakeHead = snakeBody.get(snakeBody.size()-1);
 		direction = Direction.DOWN;
 		board.addKeyListener(this);
+		painting = new HelloThread(); 
+		painting.start();
 	}
 	
 	public void createGUI() {
 		JFrame myJFrame = new JFrame();
+		myJFrame.setLayout(null);
 		myJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myJFrame.setResizable(false);
-		myJFrame.setSize(496,319);
+		int xsize = 508;
+		int ysize = 350;
+		myJFrame.setSize(xsize, ysize);
 		myJFrame.setLocation(100,100);
-		//myJFrame.setLayout(new GridLayout(2,1,10,10));
 		JPanel mainPanel = new JPanel(new BorderLayout());
+		mainPanel.setBounds(10,10,xsize-40,240);
 		myJFrame.add(mainPanel);
-//		myJFrame.add(board);
 		mainPanel.add(board, BorderLayout.CENTER);
-		//jpanel.setSize(200, 200);
 		
 		var buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		buttonPanel.setFocusable(false);
 		var sliderPanel = new JPanel(new FlowLayout());
 		sliderPanel.setFocusable(false);
 		var myPanel = new JPanel(new GridLayout(1,2));
+		myPanel.setBounds(0,250,508,110);
 		myPanel.setFocusable(false);
 		myPanel.add(buttonPanel);
 		myPanel.add(sliderPanel);
-//		myJFrame.add(myPanel);
 		myJFrame.add(myPanel, BorderLayout.PAGE_END);
 		
 		var startButton = new JButton("START");
@@ -117,11 +137,8 @@ public class Snake implements ActionListener, KeyListener {
 		
 		JSlider speedSlider = new JSlider(JSlider.HORIZONTAL, 20, 100, 50);
 		speedSlider.setFocusable(false);
-//		speedSlider.setMinorTickSpacing(1000);
 		speedSlider.setMajorTickSpacing(10);
-//		speedSlider.setPaintLabels(true);
 		speedSlider.setPaintTicks(true);
-//		JLabel 
 		sliderPanel.add(new JLabel("Snake's speed"));
 		sliderPanel.add(speedSlider);
 		
@@ -159,9 +176,9 @@ public class Snake implements ActionListener, KeyListener {
 		
 	}
 	
-	public void endGame() {
-		MyFrame com = new MyFrame("You lose");
-		com.setVisible(true);
+	public void endGame(String statement) {
+		ResultFrame result = new ResultFrame(statement);
+		result.setVisible(true);
 		timer.stop();
 	}
 	
@@ -239,12 +256,14 @@ public class Snake implements ActionListener, KeyListener {
 			
 			for(int i = 0; i < snakeBody.size()-1; i++) {
 				if(snakeHead.equals(snakeBody.get(i))) {   //check if snake collides with itself
-					endGame();
+					endGame("You lose :(");
 				}
 			}
 			
+			if(snakeBody.size() == 780)
+				endGame("You won :D");
+			
 		}	
-		board.repaint();
 	}
 
 

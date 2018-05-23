@@ -1,17 +1,15 @@
 package snake;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
 
 public class Board extends JPanel {
 	private Color snakeColor = Color.green;
-	private Color appleColor = new Color(255,0,0);
+	private Color appleColor = Color.red;
 	public Board() {
 		setOpaque(true);
 		setBackground(Color.black);
@@ -22,11 +20,9 @@ public class Board extends JPanel {
 	protected void paintComponent(Graphics graphics) {
 		// TODO Auto-generated method stub
 		super.paintComponent(graphics);
+		graphics.setColor(Color.WHITE);
+		graphics.drawString("Score: " + Integer.toString(Snake.snakeBody.size()), 10, 10);
 		graphics.setColor(snakeColor);
-		var dim = getSize();
-		graphics.drawString(Integer.toString(dim.width), 10, 10);
-		graphics.drawString(Integer.toString(dim.height), 20, 20);
-		
 		for(Point part : Snake.snakeBody) {
 			graphics.fillOval(part.x, part.y, Snake.bodyPartSize-1, Snake.bodyPartSize-1);
 		}
