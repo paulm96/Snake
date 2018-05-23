@@ -34,7 +34,7 @@ public class Snake implements ActionListener, KeyListener {
 	public int time = 0;
 	public int speed;
 	Random rand = new Random();
-//	Dimension dim;
+	
 	public Snake() {
 		createGUI();
 		speed = 50;
@@ -43,20 +43,19 @@ public class Snake implements ActionListener, KeyListener {
 		snakeHead = snakeBody.get(snakeBody.size()-1);
 		direction = Direction.DOWN;
 		board.addKeyListener(this);
-//		timer.start();
 	}
 	
 	public void createGUI() {
 		JFrame myJFrame = new JFrame();
 		myJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myJFrame.setResizable(false);
-		myJFrame.setSize(496,319);  //uzaleznic size od rozdzielczosci ekranu
-		myJFrame.setLocation(100,100); //to tez uzaleznic
+		myJFrame.setSize(496,319);
+		myJFrame.setLocation(100,100);
 		//myJFrame.setLayout(new GridLayout(2,1,10,10));
-		JPanel jpanel = new JPanel(new BorderLayout());
-		myJFrame.add(jpanel);
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		myJFrame.add(mainPanel);
 //		myJFrame.add(board);
-		jpanel.add(board, BorderLayout.CENTER);
+		mainPanel.add(board, BorderLayout.CENTER);
 		//jpanel.setSize(200, 200);
 		
 		var buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -88,6 +87,7 @@ public class Snake implements ActionListener, KeyListener {
 			}
 		});
 		buttonPanel.add(startButton);
+		
 		var restartButton = new JButton("RESTART");
 		restartButton.setFocusable(false);
 		restartButton.setFont(new Font("Arial", Font.PLAIN, 10));
@@ -101,6 +101,7 @@ public class Snake implements ActionListener, KeyListener {
 			}
 		});
 		buttonPanel.add(restartButton);
+		
 		var exitButton = new JButton("EXIT");
 		exitButton.setFocusable(false);
 		exitButton.setFont(new Font("Arial", Font.PLAIN, 10));
@@ -118,8 +119,9 @@ public class Snake implements ActionListener, KeyListener {
 		speedSlider.setFocusable(false);
 //		speedSlider.setMinorTickSpacing(1000);
 		speedSlider.setMajorTickSpacing(10);
-		speedSlider.setPaintLabels(true);
+//		speedSlider.setPaintLabels(true);
 		speedSlider.setPaintTicks(true);
+//		JLabel 
 		sliderPanel.add(new JLabel("Snake's speed"));
 		sliderPanel.add(speedSlider);
 		
@@ -157,37 +159,34 @@ public class Snake implements ActionListener, KeyListener {
 		
 	}
 	
+	public void endGame() {
+		MyFrame com = new MyFrame("You lose");
+		com.setVisible(true);
+		timer.stop();
+	}
+	
 	public void generateApple(Dimension dim) {
 		int x = rand.nextInt(dim.width);
 		int y = rand.nextInt(dim.height);
 		boolean found = false;  //if apple is found
-		System.out.println("japko");
 		while(!found) {
-			System.out.println("japko_while1");
 			while(x % bodyPartSize != 0) {   //apple should be generated in the same multiple pixels as snake parts
-				System.out.println("japko_while2");
 				x = rand.nextInt(dim.width - bodyPartSize);
 			}
 			while(y % bodyPartSize != 0) {
-				System.out.println("japko_while3");
 				y = rand.nextInt(dim.height - bodyPartSize);
 			}
 			for(Point point : snakeBody) {
-				System.out.println("japko_for");
 				if(point.x == x && point.y == y) {  //if apple's point collides with snake
-					System.out.println("japko_if");
 					found = false;
-					x = y = 0;
+					x = rand.nextInt(dim.width);
+					y = rand.nextInt(dim.height);
 					break;
 				}
 				found = true;
-				System.out.println("japko_forzaif");
-				
 			}
 		}
-		System.out.println("japko_koniec1");
 		apple = new Point(x,y);
-		System.out.println("japko_koniec2");
 	}
 
 	@Override
@@ -230,22 +229,16 @@ public class Snake implements ActionListener, KeyListener {
 			}
 		
 			snakeHead = snakeBody.get(snakeBody.size()-1);  //move the head
-			System.out.println("tutej");
 			
 			if(!snakeHead.equals(apple)) {   //if snake doesn't collide with an apple
 				snakeBody.remove(0);       //shorten the tail
-				System.out.println("tutej2");
 			}
 			else {
 				apple = null;
-				System.out.println("tutej3");
 			}
 			
 			for(int i = 0; i < snakeBody.size()-1; i++) {
-				System.out.println(snakeBody.size()-1);
-				System.out.println("tutej_for");
 				if(snakeHead.equals(snakeBody.get(i))) {   //check if snake collides with itself
-					System.out.println("tutej_endgame");
 					endGame();
 				}
 			}
@@ -253,10 +246,7 @@ public class Snake implements ActionListener, KeyListener {
 		}	
 		board.repaint();
 	}
-	
-	public void endGame() {
-		timer.stop();
-	}
+
 
 	@Override
 	public void keyPressed(KeyEvent key) {
@@ -265,66 +255,32 @@ public class Snake implements ActionListener, KeyListener {
 		
 		switch(code) {
 		case KeyEvent.VK_UP:
-			direction = Direction.UP;
+			if(direction != Direction.DOWN)
+				direction = Direction.UP;
 			break;
 		case KeyEvent.VK_DOWN:
-			direction = Direction.DOWN;
+			if(direction != Direction.UP)
+				direction = Direction.DOWN;
 			break;
 		case KeyEvent.VK_LEFT:
-			direction = Direction.LEFT;
+			if(direction != Direction.RIGHT)
+				direction = Direction.LEFT;
 			break;
 		case KeyEvent.VK_RIGHT:
-			direction = Direction.RIGHT;
+			if(direction != Direction.LEFT)
+				direction = Direction.RIGHT;
 			break;	
 		}
-		
-		board.repaint();
 	}
 
 	@Override
 	public void keyReleased(KeyEvent key) {
 		// TODO Auto-generated method stub
-		int code = key.getKeyCode();
-		
-		switch(code) {
-		case KeyEvent.VK_UP:
-			direction = Direction.UP;
-			break;
-		case KeyEvent.VK_DOWN:
-			direction = Direction.DOWN;
-			break;
-		case KeyEvent.VK_LEFT:
-			direction = Direction.LEFT;
-			break;
-		case KeyEvent.VK_RIGHT:
-			direction = Direction.RIGHT;
-			break;	
-		}
 	}
 
 	@Override
 	public void keyTyped(KeyEvent key) {
 		// TODO Auto-generated method stub
-		int code = key.getKeyCode();
-		
-		switch(code) {
-		case KeyEvent.VK_UP:
-			direction = Direction.UP;
-			break;
-		case KeyEvent.VK_DOWN:
-			direction = Direction.DOWN;
-			break;
-		case KeyEvent.VK_LEFT:
-			direction = Direction.LEFT;
-			break;
-		case KeyEvent.VK_RIGHT:
-			direction = Direction.RIGHT;
-			break;	
-		}
 	}
-	
-//	static void stopSnake() {
-//		timer.stop();
-//	}
 
 }
